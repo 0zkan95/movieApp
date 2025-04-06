@@ -44,7 +44,7 @@ export default function Home() {
     fetchConfiguration();
   }, [dispatch])     // adding dispatch to dependency array is a good practice
   return (
-    <main className="text-5xl text-center mt-8 text-purple-700">
+    <main className="text-5xl text-center text-purple-700">
        <BannerHome />
     </main>
   );

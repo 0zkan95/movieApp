@@ -33,7 +33,7 @@ const Header = () => {
     }
 
     return (
-        <header className='fixed top-0 w-full h-16 bg-neutral-900 opacity-100'>
+        <header className='fixed top-0 w-full h-16 bg-neutral-900 opacity-75 z-10'>
             <div className='container mx-auto px-2 flex items-center h-full'>
                 <Link href="/">
                     <Image src="/logo.png" alt="logo" width={200} height={160} />
