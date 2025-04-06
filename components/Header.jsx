@@ -34,9 +34,16 @@ const Header = () => {
 
     return (
         <header className='fixed top-0 w-full h-16 bg-neutral-900 opacity-75 z-10'>
-            <div className='container mx-auto px-2 flex items-center h-full'>
+            <div className='container mx-auto px-4 flex items-center h-full'>
                 <Link href="/">
-                    <Image src="/logo.png" alt="logo" width={200} height={160} />
+                    <Image 
+                        src="/logo.png" 
+                        alt="logo" 
+                        width={200} 
+                        height={160} 
+                        priority 
+                        className='h-10 w-auto'
+                    />
                 </Link>
 
                 <nav className='hidden lg:flex px-4 ml-6'>

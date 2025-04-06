@@ -11,7 +11,7 @@ const BannerHome = () => {
 
     const [currentImage, setCurrentImage] = useState(0)
     const handleNext = () => {
-        if(currentImage < bannerData.length - 1) {
+        if (currentImage < bannerData.length - 1) {
             setCurrentImage(prev => prev + 1)
         } else {
             setCurrentImage(0)
@@ -19,7 +19,7 @@ const BannerHome = () => {
     }
 
     const handlePrev = () => {
-        if(currentImage > 0) {
+        if (currentImage > 0) {
             setCurrentImage(prev => prev - 1)
         } else {
             setCurrentImage(bannerData.length - 1)
@@ -28,20 +28,20 @@ const BannerHome = () => {
 
     useEffect(() => {
         const intervalId = setInterval(() => {
-            if(currentImage < bannerData.length - 1) {
+            if (currentImage < bannerData.length - 1) {
                 handleNext()
             } else {
                 setCurrentImage(0)
             }
 
         }, 4000)
-        
+
         return () => clearInterval(intervalId)
     }, [bannerData.length, imageURL, currentImage])
 
     return (
-        <section className='w-full h-full'>
-            <div className='flex min-h-full max-h-[95vh]'>
+        <section className='w-full h-[450px] lg:h-[95vh] overflow-hidden'>
+            <div className='flex transition-transform duration-500 ease-in-out h-full'>
                 {imageURL && bannerData.map((data, index) => {
                     const imagePath = data.backdrop_path || data.poster_path;
                     if (!imagePath) {
@@ -51,11 +51,13 @@ const BannerHome = () => {
                     const fullImageUrl = `${imageURL}${imagePath}`;
 
                     return (
-                        <div 
-                            key={index} 
-                            className='min-w-full min-h-[450px] lg:min-h-full overflow-hidden relative transition-all ease-in-out'
-                            style={{ transform: `translateX(-${currentImage * 100}%)` }}    
+
+                        <div
+                            key={data.id+"bannerHome"+index}
+                            className='min-w-full min-h-[450px] lg:min-h-full relative'
+                            style={{ transform: `translateX(-${currentImage * 100}%)` }}
                         >
+
                             <div className='w-full h-full'>
                                 <img
                                     src={fullImageUrl}
@@ -65,23 +67,28 @@ const BannerHome = () => {
                             </div>
 
                             {/* next and prev button */}
-                            <div className='absolute top-0 h-full w-full items-center justify-between text-white lg:flex'>
-                                <button 
+
+                            <div className='absolute top-0 h-full w-full items-center justify-between text-white lg:flex hidden'>
+                                <button
                                     className='hover:text-[#F17FFF] hover:cursor-pointer z-10 transition-all duration-300 hover:scale-105'
                                     onClick={handlePrev}
                                 >
                                     <FaChevronLeft />
                                 </button>
-                                <button 
+                                <button
                                     className='hover:text-[#F17FFF] hover:cursor-pointer z-10 transition-all duration-300 hover:scale-105'
                                     onClick={handleNext}
                                 >
                                     <FaChevronRight />
                                 </button>
                             </div>
+
                             <div className='absolute top-0 w-full h-full bg-gradient-to-t from-neutral-900 to-transparent'>
 
                             </div>
+
+                            {/**  Information Section */}
+
                             <div className='container mx-auto absolute bottom-4 max-w-md px-3'>
                                 <h2 className='font-bold text-2xl lg:text-4xl'>{data?.title || data?.name}</h2>
                                 <p className='text-white text-[1rem] text-left text-ellipsis line-clamp-3 my-1 leading-6'> {data.overview} </p>
