@@ -2,7 +2,7 @@ import React, { useRef } from 'react'
 import Cart from "@/components/Cart";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-const HorizontalScroll = ({ data = [], heading }) => {
+const HorizontalScroll = ({ data = [], heading, trending, media_type }) => {
 
   const containerRef = useRef();
 
@@ -31,23 +31,24 @@ const HorizontalScroll = ({ data = [], heading }) => {
                 key={item.id + "heading" + index}
                 data={item}
                 index={index + 1}
-                Horizontal={true}
+                trending={trending}
+                media_type={media_type}
               />
             )
           })}
         </div>
 
-        <div className='absolute top-0 left-0 right-0 bottom-0 flex items-center justify-between pointer-events-none'>
+        <div className='absolute top-0 left-0 right-0 bottom-0 hidden lg:flex items-center justify-between pointer-events-none'>
           <button
             className='text-[#F17FFF] bg-black/20 hover:bg-black/50 rounded-full p-2 backdrop-blur-sm shadow-md hover:text-[#F17FFF] hover:cursor-pointer z-10 transition-all duration-300 hover:scale-110 pointer-events-auto absolute -left-3 top-1/2 -translate-y-1/2'
-            onClick={() => handleScroll(-300)}
+            onClick={() => handleScroll(-460)}
             aria-label='Scroll previous'
           >
             <FaChevronLeft />
           </button>
           <button
             className='text-[#F17FFF] bg-black/20 hover:bg-black/50 rounded-full p-2 backdrop-blur-sm shadow-md hover:text-[#F17FFF] hover:cursor-pointer z-10 transition-all duration-300 hover:scale-110 pointer-events-auto absolute -right-3 top-1/2 -translate-y-1/2 '
-            onClick={() => handleScroll(+300)}
+            onClick={() => handleScroll(+460)}
             aria-label='Scroll next'
           >
             <FaChevronRight />

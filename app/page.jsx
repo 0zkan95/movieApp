@@ -1,6 +1,7 @@
 "use client"
 import BannerHome from "@/components/BannerHome";
 import HorizontalScroll from "@/components/HorizontalScroll";
+import useFetch from "@/hooks/useFetch";
 import { setBannerData, setImageURL } from "@/store/movieSlice";
 import axios from "axios";
 import { useEffect } from "react";
@@ -8,17 +9,16 @@ import { useDispatch, useSelector } from "react-redux";
 
 
 
-axios.defaults.baseURL = "https://api.themoviedb.org/3/"
-const accessToken = process.env.NEXT_PUBLIC_ACCESS_TOKEN;
-if (accessToken) {
-  axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-} else {
-  console.warn("TMDB Access Token is missing.")
-}
+axios.defaults.baseURL = "/api"
 
 
 export default function Home() {
   const dispatch = useDispatch();
+  const { data: nowPlayingData } = useFetch('/movie/now_playing');
+  const { data: topRatedData } = useFetch('/movie/top_rated');
+  const { data: popularTvShowData } = useFetch('/tv/popular');
+  const { data: onTheAirShowData } = useFetch('/tv/on_the_air');
+
 
   const fetchTrendingData = async () => {
     try {
@@ -34,8 +34,7 @@ export default function Home() {
     try {
 
       const response = await axios.get("/configuration");
-      dispatch(setImageURL(response.data.images.secure_base_url + "original"))
-      console.log('config data: ', response)
+      dispatch(setImageURL(response.data.images.secure_base_url))
     } catch (error) {
 
       console.log('configuration error: ', error)
@@ -50,10 +49,15 @@ export default function Home() {
 
   const trendingData = useSelector(state => state.movieData.bannerData)
 
+
   return (
     <main className="text-5xl text-center text-purple-700">
       <BannerHome />
-      <HorizontalScroll data={trendingData} heading={"Trending Theaters"} />
+      <HorizontalScroll data={trendingData} heading={"Trending Theaters"} trending={true} />
+      <HorizontalScroll data={nowPlayingData} heading={"Now Playing"} media_type={"movie"} />
+      <HorizontalScroll data={topRatedData} heading={"Top Rated Movies"} media_type={"movie"} />
+      <HorizontalScroll data={popularTvShowData} heading={"Popular Tv Shows"} media_type={"tv"} />
+      <HorizontalScroll data={onTheAirShowData} heading={"On The Air"} media_type={"tv"} />
     </main>
   );
 }

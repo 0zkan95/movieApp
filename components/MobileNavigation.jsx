@@ -17,7 +17,7 @@ const MobileNavigation = () => {
     const isActive = (href) => pathname === href;
 
     return (
-        <section className='lg:hidden h-14 bg-neutral-800 opacity-40 fixed bottom-0 w-full'>
+        <section className='lg:hidden h-14 bg-black opacity-70 fixed bottom-0 w-full z-20'>
             <div className='flex items-center justify-between px-3 h-full'>
                 <Link 
                     href="/" 
@@ -29,7 +29,7 @@ const MobileNavigation = () => {
                     </div>
                 </Link>
                 <Link 
-                    href="/tv-shows" 
+                    href="/explore/tv" 
                     className={`${linkBaseClass} ${isActive('/tv-shows') ? linkActiveClass : ''}`}
                 >
                     <LuTv size={25} className='mx-auto' />
@@ -38,7 +38,7 @@ const MobileNavigation = () => {
                     </div>
                 </Link>
                 <Link 
-                    href="/movies" 
+                    href="/explore/movie" 
                     className={`${linkBaseClass} ${isActive('/movies') ? linkActiveClass : ''}`}
                 >
                     <BiMoviePlay size={25} className='mx-auto' />

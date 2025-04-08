@@ -4,24 +4,29 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MdOutlineScreenSearchDesktop } from "react-icons/md";
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 
 
 const Header = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const pathname = usePathname();
 
     const initialQuery = searchParams.get('q') || '';
     const [searchInput, setSearchInput ] = useState(initialQuery);
     
     useEffect(() => {
+
+        if (!searchInput && pathname.startsWith('/search')) {
+            return;
+        }
+
         const handler = setTimeout(() => {
             if(searchInput) {
                 router.push(`/search?q=${encodeURIComponent(searchInput)}`);  //push only if there is actual search input
-            } else {
-                router.push('/'); // if it is not actual search input go back search page
-            }
+            } 
+
         }, 500)
         // cleanup the function
         return () => clearTimeout(handler);
@@ -47,8 +52,8 @@ const Header = () => {
                 </Link>
 
                 <nav className='hidden lg:flex px-4 ml-6'>
-                    <Link href="#tv" className='ml-4  text-neutral-600 hover:text-neutral-100'>TV Shows</Link>
-                    <Link href="movies" className='ml-4 text-neutral-600 hover:text-neutral-100'> Movies </Link>
+                    <Link href="/explore/tv" className='ml-4  text-neutral-600 hover:text-neutral-100'>TV Shows</Link>
+                    <Link href="/explore/movie" className='ml-4 text-neutral-600 hover:text-neutral-100'> Movies </Link>
                 </nav>
 
                 <div className='flex items-center gap-5 ml-auto'>
