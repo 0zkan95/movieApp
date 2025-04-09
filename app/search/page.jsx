@@ -18,9 +18,11 @@ const SearchPage = () => {
     // --- Corrected fetchData ---
     const fetchData = useCallback(async (searchTerm) => {
         // Prevent fetching if already loading or no search term provided
-        if (loading || !searchTerm) {
-            if (!searchTerm) setData([]); // Clear data if search term is removed
-            return;
+        if (!searchTerm) {
+          setData([])
+          setError(null)
+          setLoading(false)
+          return;
         }
 
         console.log(`Fetching data for query: ${searchTerm}`);
@@ -52,22 +54,21 @@ const SearchPage = () => {
             setLoading(false);
         }
 
-    }, [loading]); // Depend on loading state to potentially prevent overlapping requests via useCallback memoization
+    }, []); // Depend on loading state to potentially prevent overlapping requests via useCallback memoization
 
 
     useEffect(() => {
-        const currentQuery = searchParams.get('q');
 
-        if (currentQuery) {
-            fetchData(currentQuery);
+        if (query) {
+            fetchData(query);
         } else {
             // If query is removed, clear results and error
             setData([]);
             setError(null); // Ensure error is null
-            setLoading(false); // Ensure loading is false if query is cleared
+            setLoading(false);
         }
         
-    }, [searchParams, fetchData]); // Depend on searchParams object and the fetchData callback
+    }, [query, fetchData]); // Depend on searchParams object and the fetchData callback
 
 
     return (
