@@ -49,19 +49,22 @@ const Header = () => {
                         priority 
                         className='h-10 w-auto'
                     />
-                </Link>
+                </Link> 
 
                 <nav className='hidden lg:flex px-4 ml-6'>
-                    <Link href="/explore/tv" className='ml-4  text-neutral-600 hover:text-neutral-100'>TV Shows</Link>
-                    <Link href="/explore/movie" className='ml-4 text-neutral-600 hover:text-neutral-100'> Movies </Link>
+                    <Link href="/explore/tv" className='ml-4  text-purple-600 hover:text-purple-100'>TV Shows</Link>
+                    <Link href="/explore/movie" className='ml-4 text-purple-600 hover:text-purple-100'> Movies </Link>
                 </nav>
 
-                <div className='flex items-center gap-5 ml-auto'>
-                    <form className='items-center gap-2 flex' onSubmit={handleSubmit}>
+                <div className='flex items-center gap-5 ml-auto '>
+                    <form 
+                        className='items-center justify-around gap-2 hidden lg:flex' 
+                        onSubmit={handleSubmit}
+                    >
                         <input 
                             type="text" 
                             placeholder='Search...' 
-                            className='bg-transparent border-2 rounded-lg px-4 hidden lg:block' 
+                            className='bg-transparent border-2 rounded-lg px-4 ' 
                             onChange={(e) => setSearchInput(e.target.value)}
                             value={searchInput}
                         />
