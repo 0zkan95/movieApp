@@ -9,9 +9,6 @@ import { useDispatch, useSelector } from "react-redux";
 
 
 
-axios.defaults.baseURL = "/api"
-
-
 export default function Home() {
   const dispatch = useDispatch();
   const { data: nowPlayingData } = useFetch('/movie/now_playing');
@@ -30,21 +27,9 @@ export default function Home() {
     }
   }
 
-  const fetchConfiguration = async () => {
-    try {
-
-      const response = await axios.get("/configuration");
-      dispatch(setImageURL(response.data.images.secure_base_url))
-    } catch (error) {
-
-      console.log('configuration error: ', error)
-    }
-  }
-
   useEffect(() => {
     fetchTrendingData();
-    fetchConfiguration();
-  }, [dispatch])     // adding dispatch to dependency array is a good practice
+  },[dispatch])
 
 
   const trendingData = useSelector(state => state.movieData.bannerData)

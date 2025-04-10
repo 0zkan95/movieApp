@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileNavigation from "@/components/MobileNavigation";
 import StoreProvider from "@/store/Provider";
+import MobileSearchInput from "@/components/MobileSearchInput";
 
 
 
@@ -29,7 +30,7 @@ export default function RootLayout({ children }) {
       >
         <StoreProvider>
           <Header />
-
+          <MobileSearchInput />
           <div>
             {children}
 

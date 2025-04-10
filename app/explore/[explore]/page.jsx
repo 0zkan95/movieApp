@@ -2,9 +2,11 @@
 import React from 'react';
 import { useCallback, useEffect, useState, useRef } from 'react'
 import axios from 'axios';
-import { useParams } from 'next/navigation'
+import { useParams, notFound } from 'next/navigation'
 import Cart from '@/components/Cart';
 import LoadingSpinner from '@/components/LoadingSpinner';
+
+const VALID_EXPLORE_TYPES = ['movie', 'tv']
 
 const ExplorePage = () => {
   const params = useParams();
@@ -15,84 +17,108 @@ const ExplorePage = () => {
   const [data, setData] = useState([]);
   const [totalPageNo, setTotalPageNo] = useState(0);
   const [loading, setLoading] = useState(false); //  => Add loading state
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);  // --- True before the first fetch completes
   const [error, setError] = useState(null); // => Add error state
 
+  const isFetching = useRef(false); // -- Ref to prevent race conditions/multiple fetches
+  const hasFetchedInitialPage = useRef(false); // -- Tracks if page 1 fetch is done for scroll handler
 
-  const isInitialLoadDone = useRef(false);
+  // ---- exploreType validation
+  useEffect(() => {
+    if (exploreType && !VALID_EXPLORE_TYPES.includes(exploreType)) {
+      notFound();
+    }
+  }, [exploreType]);
 
   const fetchData = useCallback(async (pageNumToFetch) => {
-    if (loading || (totalPageNo > 0 && pageNumToFetch > totalPageNo) || !exploreType) {
+    if (isFetching.current || !exploreType || (totalPageNo > 0 && pageNumToFetch > totalPageNo)) {
       return;
     }
 
-    if (!exploreType) {
-      console.log("Fetch skipped exploreType not ready.")
-      return;
-    }
 
-    if (pageNumToFetch = 1) {
-      setInitialLoading(true)
-    }
-
+    console.log(` Attempting to fetch ${exploreType} page: ${pageNumToFetch} `);
+    isFetching.current = true;
     setLoading(true);
     setError(null);
 
+    if (pageNumToFetch === 1) {
+      setInitialLoading(true)
+      hasFetchedInitialPage.current = false;   // --- Reset scroll flag
+    }
 
     try {
-      const response = await axios.get(`/discover/${params.explore}`, {
+      const response = await axios.get(`/discover/${exploreType}`, {
         params: {
-          page: pageNo
+          page: pageNumToFetch
         }
       });
 
+      const results = response.data.results || [];
+      const totalPages = response.data.total_page || 0;
+
       if (pageNumToFetch === 1) {
-        setData(response.data.results || []);
+        setData(results);
       } else {
-        setData((prev) => [...prev, ...(response.data.results || [])]);
+        setData((prev) => [...prev, ...results]);   // ---> Append data for subsequent pages
       }
-      setTotalPageNo(response.data.total_pages || 0)
+      setTotalPageNo(totalPageNo);
+
+      if (pageNumToFetch === 1) {
+        hasFetchedInitialPage.current = true;    /// ----> Mark initial fetch as done after success
+      }
+      console.log(` Successfully fetched page ${pageNumToFetch}. Total pages: ${totalPages} `);
 
     } catch (err) {
-      console.log("Explore Page Error: ", err);
-      setError(err.message || "Failed to fetch data")
+
+      console.error(`Explore Page Error fetching ${exploreType} page ${pageNumToFetch}:`, err);
+      const errorMsg = err.response?.data?.message || err.message || ` Failed to fetch ${exploreType} data. `
+      setError(errorMsg);
+
+      if (pageNumToFetch === 1) {  // ----> reset data if page 1 fails fundamentally
+
+        setData([]);
+        setTotalPageNo(0);
+      }
+
     } finally {
+
       setLoading(false);
       setInitialLoading(false);
-      if (pageNumToFetch === 1) {
-        isInitialLoadDone.current === true;
+      isFetching.current = false;
 
-        setTimeout(() => {
-          isInitialLoadDone.current = true;
-        }, 500);
-      }
     }
-  }, [exploreType, loading, totalPageNo]);
+
+  }, [exploreType, totalPageNo]);   //---> totalPageNo needed for the guard check
 
 
   useEffect(() => {
 
-    if (exploreType) {
+    if (exploreType && VALID_EXPLORE_TYPES.includes(exploreType)) {
+      console.log(`Explore type changed to: ${exploreType}. Resetting and fetching page 1.`);
 
       setPageNo(1);
       setData([]); // Clear old data when type changes
       setTotalPageNo(0); // Reset total pages
-      isInitialLoadDone.current === false;
-      fetchData();
+      fetchData(1);
+    } else if (exploreType) {
+      setError(` Invalid explore type: ${exploreType} `);
+      setData([]);
+      setTotalPageNo(0);
+      setInitialLoading(false)
     }
-  }, [exploreType]); // Trigger fetch when exploreType is available/changes
+  }, [exploreType, fetchData]); // Trigger fetch 
 
 
 
   // Fetch subsequent pages when pageNo increases (but not on initial mount with type)
   useEffect(() => {
-    if (pageNo > 1 && exploreType) {
+    if (pageNo > 1 && exploreType && VALID_EXPLORE_TYPES.includes(exploreType)) {
       fetchData(pageNo);
     }
-  }, [pageNo, exploreType])
+  }, [pageNo, fetchData, exploreType])
 
   const handleScroll = useCallback(() => {
-    if (!isInitialLoadDone.current || loading || (totalPageNo > 0 && pageNo >= totalPageNo)) {
+    if (!hasFetchedInitialPage.current || isFetching.current || (totalPageNo > 0 && pageNo >= totalPageNo)) {
       return;
     }
 
@@ -101,9 +127,9 @@ const ExplorePage = () => {
     // Check if near bottom
     if (nearBottom) { // Trigger slightly before exact bottom
 
-      setPageNo((prev) => prev + 1);
+      setPageNo((prevPageNo) => prevPageNo + 1);
     }
-  }, [loading, pageNo, totalPageNo]); // Include dependencies
+  }, [pageNo, totalPageNo]); // Include dependencies
 
   // Add/Remove scroll listener
   useEffect(() => {
@@ -117,10 +143,28 @@ const ExplorePage = () => {
 
   // ---- >  Render logic
 
-  if (initialLoading && pageNo === 1) {
+  if (initialLoading && data.length === 1) {
     return (
       <div className='min-h-[80vh] flex justify-center items-center'>
         <LoadingSpinner size="lg" />
+      </div>
+    )
+  }
+
+  // Handle case where type is invalid after initial checks (belt and suspenders)
+
+  if (!VALID_EXPLORE_TYPES.includes(exploreType)) {
+    // Or render a specific "Invalid Category" component
+    return <div className="pt-16 text-center text-purple-500 mt-20">Invalid explore category specified.</div>;
+  }
+
+  // Handle fundamental error loading initial data
+
+  if (error && data.length === 0) {
+    return (
+      <div className="pt-16 text-center text-purple-500 my-20 border border-purple-400 rounded p-4 max-w-md mx-auto">
+        <p className='font-semibold'>Error loading initial data:</p>
+        <p className='my-4'>{error}</p>
       </div>
     )
   }

@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     bannerData: [],
     imageURL: "",
+    isMobileSearchVisible: false,
 }
 
 export const movieSlice = createSlice({
@@ -15,11 +16,18 @@ export const movieSlice = createSlice({
         },
         setImageURL: (state, action) => {
             state.imageURL = action.payload
+        },
+
+        openMobileSearch: (state) => {
+            state.isMobileSearchVisible = true;
+        },
+        closeMobileSearch: (state) => {
+            state.isMobileSearchVisible = false;
         }
     }
 
 })
 
-export const { setBannerData, setImageURL } = movieSlice.actions
+export const { setBannerData, setImageURL, openMobileSearch, closeMobileSearch } = movieSlice.actions
 
 export default movieSlice.reducer;

@@ -5,7 +5,7 @@ import { FaStar } from "react-icons/fa6";
 import Link from 'next/link';
 import Image from 'next/image';
 
-const PLACEHOLDER_IMAGE = '/logo.png'
+const PLACEHOLDER_IMAGE = '/moviePlaceHolder.png'
 
 
 const Cart = ({ data, trending, index, media_type }) => {
@@ -62,6 +62,7 @@ const Cart = ({ data, trending, index, media_type }) => {
                 <Image // Use Next.js Image component
                     src={fullImageUrl}
                     alt={displayName} // Use display name for alt text
+                    priority
                     fill // Use fill to cover the container
                     style={{ objectFit: 'cover' }} // Cover ensures the image fills aspect ratio
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 230px" // Provide sizes for optimization

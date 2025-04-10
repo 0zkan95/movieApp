@@ -32,7 +32,7 @@ const SearchPage = () => {
 
         try {
            
-            const response = await axios.get(`/search/collection`, {
+            const response = await axios.get(`/search/multi`, {
                 params: {
                     query: searchTerm,
                     page: 1, // Fetch page 1 for now (pagination not implemented)
@@ -72,11 +72,11 @@ const SearchPage = () => {
 
 
     return (
-        <div className='container mx-auto px-4 pt-24 pb-10'>  
-            <h1 className="text-3xl font-bold mb-2 text-neutral-100">Search Results</h1>
+        <div className='container mx-auto px-4 pt-24 pb-10 my-8'>  
+            <h1 className="text-3xl font-bold mb-2 text-purple-500">Search Results</h1>
             {/* Conditional subtitle */}
             {query && (
-                 <h2 className="text-xl font-semibold mb-6 text-neutral-300">
+                 <h2 className="text-xl font-semibold mb-6 text-purple-400">
                      for "{query}"
                  </h2>
             )}
