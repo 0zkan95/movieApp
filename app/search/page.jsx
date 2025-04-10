@@ -25,7 +25,6 @@ const SearchPage = () => {
           return;
         }
 
-        console.log(`Fetching data for query: ${searchTerm}`);
         setLoading(true);
         setError(null);
         setData([]); // Clear previous results for a new search

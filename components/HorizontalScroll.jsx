@@ -40,16 +40,17 @@ const HorizontalScroll = ({ data = [], heading, trending, media_type }) => {
 
 
             return (
-              <Link href={detailUrl} key={item.id + '-' + heading} className='flex-shrink-0'>
+                <Link href={detailUrl} key={item.id + '-' + heading} className='flex-shrink-0'>
 
-                  <Cart
-                    
-                    data={item}
-                    index={index + 1}
-                    trending={trending}
-                    media_type={media_type}
-                  />
-              </Link>
+                      <Cart
+                        
+                        data={item}
+                        index={index + 1}
+                        trending={trending}
+                        media_type={media_type}
+                      />
+                      
+                </Link>
             )
           })}
         </div>

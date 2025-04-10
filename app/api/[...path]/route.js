@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 
 
-export async function GET(request, context) {
-
-    const pathSegments = context.params.path || [];
-    console.log('API Route pathSegments:', pathSegments);
+export async function GET(request, { params }) {
+    
+    const pathSegments = params.path || [];
 
 
     if (pathSegments.length === 0) {
@@ -14,11 +13,7 @@ export async function GET(request, context) {
     }
 
     const apiPath = pathSegments.join('/');   // Reconstructs to 'search/collection'
-    console.log('API Route constructed apiPath:', apiPath); // Log the reconstructed path
 
-    // 2. Get the *full* query string from the incoming request
-    // This includes the leading '?', e.g., "?query=batman&page=1"
-    // This is the simplest way to forward all client-side query params.
     const queryString = request.nextUrl.search;
 
     // --- TMDB API CONFİGURATİON ---
@@ -33,7 +28,6 @@ export async function GET(request, context) {
 
     // Construct the target API URL
     const targetUrl = `${API_BASE_URL}/${apiPath}${queryString}`;
-    console.log(`API Route: Proxying request to: ${targetUrl}`);
 
     try {
         const apiResponse = await fetch(targetUrl, {
@@ -97,4 +91,4 @@ export async function GET(request, context) {
             { status: 500 }
         );
     }
-}
+};

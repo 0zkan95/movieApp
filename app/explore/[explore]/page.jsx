@@ -36,7 +36,6 @@ const ExplorePage = () => {
     }
 
 
-    console.log(` Attempting to fetch ${exploreType} page: ${pageNumToFetch} `);
     isFetching.current = true;
     setLoading(true);
     setError(null);

@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { FaChevronLeft, FaChevronRight, FaStar } from "react-icons/fa";
 import Image from 'next/image';
+import LoadingSpinner from './LoadingSpinner';
 
 
 
@@ -52,9 +53,9 @@ const BannerHome = () => {
     // -- Render fallback if no data or base URL
     if (!imageBaseUrl || bannerData.length === 0) {
         return (
-            <section className='flex items-center justify-center w-full h-[450px] lg:h-[95vh] bg-neutral-800 text-white'>
-                Loading Banner...
-
+            <section className='relative w-full h-[450px] lg:h-[95vh] flex items-center justify-center bg-neutral-800'>
+                {/* Optional: Add a background color */}
+                <LoadingSpinner size="lg" spinnerColor="border-purple-500" /> {/* Use appropriate size/color */}
             </section>
         );
     }
@@ -140,7 +141,7 @@ const BannerHome = () => {
                                             <span>Popularity: {displayPopularity}</span>
                                         )}
                                     </div>
-                                    
+
                                 </div>
                             </div>
                         </div>
@@ -156,14 +157,14 @@ const BannerHome = () => {
                     aria-label="Previous slide"
                     className='absolute -left-2 top-1/2 -translate-y-1/2 ml-4 p-3 bg-black/30 rounded-full text-purple-500 duration-300 cursor-pointer hover:scale-110'
                 >
-                    <FaChevronLeft size={30} /> 
+                    <FaChevronLeft size={30} />
                 </button>
                 <button
                     onClick={handleNext}
                     aria-label="Next slide"
                     className='absolute -right-2 top-1/2 -translate-y-1/2 mr-4 p-3 bg-black/30 rounded-full text-purple-500 duration-300 cursor-pointer hover:scale-110'
                 >
-                    <FaChevronRight size={30} /> 
+                    <FaChevronRight size={30} />
                 </button>
             </div>
         </section>

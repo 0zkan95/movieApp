@@ -9,10 +9,25 @@ import { FaStar } from 'react-icons/fa6';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import VideoPlayer from '@/components/VideoPlayer';
 import CastCard from '@/components/CastCard';
+import HorizontalScroll from '@/components/HorizontalScroll';
+import useFetch from '@/hooks/useFetch';
 
 const VALID_MEDIA_TYPES = ['movie', 'tv'];
 const PLACEHOLDER_POSTER = '/moviePlaceHolder.png';
 const PLACEHOLDER_BACKDROP = '/images/backdrop-placeholder.png';
+
+const getCrewByJob = (crewList, jobs) => {
+  const crewByJob = {};
+  if (!crewList) return crewByJob;
+
+  jobs.forEach(job => {
+    const members = crewList.filter(member => member.job === job);
+    if (members.length > 0) {
+      crewByJob[job] = members.map(m => m.name).join(', ');
+    }
+  });
+  return crewByJob;
+};
 
 const DetailsPage = () => {
 
@@ -28,6 +43,11 @@ const DetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  
+  const { data: similarData } = useFetch(mediaType && id ? `/${mediaType}/${id}/similar` : null);
+  const { data: recommendationData } = useFetch(mediaType && id ? `/${mediaType}/${id}/recommendations` : null);
+
+
   // --- Data Fetching ---
   const fetchData = useCallback(async () => {
     // Validate params before fetching
@@ -41,7 +61,6 @@ const DetailsPage = () => {
 
     setLoading(true);
     setError(null);
-    console.log(`Fetching details for ${mediaType}/${id}...`);
 
     try {
 
@@ -50,8 +69,6 @@ const DetailsPage = () => {
           append_to_response: 'credits,videos'
         }
       });
-
-      console.log("API Response:", response.data); // Log response for debugging
 
       setDetails(response.data);
       setCast(response.data.credits?.cast || []); // Get cast from appended credits
@@ -70,8 +87,15 @@ const DetailsPage = () => {
   }, [mediaType, id]); // Depend on mediaType and id
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);   // depend on fetchData
+    if (mediaType && id) {
+      fetchData();
+    } else {
+      setLoading(false);
+      if (!VALID_MEDIA_TYPES.includes(mediaType) || !/^\d+$/.test(id)) {
+        setError("Invalid media type or ID format in URL.");
+      }
+    }
+  }, [fetchData, mediaType, id]);   // depend on fetchData
 
   // --- Render Helper Functions ---
   const getImageUrl = (path, size = "original") => {
@@ -127,16 +151,35 @@ const DetailsPage = () => {
     first_air_date,
     genres,
     runtime,
-    episode_run_time // (array)
+    episode_run_time,
+    credits
   } = details;
 
   const displayTitle = title || name || "Untitled";
   const displayDate = release_date || first_air_date;
-  const displayRuntime = (runtime / 60).toFixed(1).split(".") || (episode_run_time && episode_run_time.length > 0 ? `${episode_run_time[0]}m per episode` : null);
+  const calculateRuntime = () => {
+    if (mediaType === 'movie' && runtime) {
+      const hours = Math.floor(runtime / 60);
+      const minutes = runtime % 60;
+      return `${hours}h ${minutes}m`;
+    } else if (mediaType === 'tv' && episode_run_time && episode_run_time.length > 0) {
+
+      return `${episode_run_time[0]}m / ep`;
+    }
+    return null;
+  };
+
+  const displayRuntime = calculateRuntime();
   const displayRating = vote_average ? Number(vote_average).toFixed(1) : null;
 
   const backdropUrl = getImageUrl(backdrop_path, "original");
   const posterUrl = getImageUrl(poster_path, "w500");
+
+
+
+  const jobsOfInterest = ['Director', 'Screenplay', 'Writer', 'Producer', 'Original Music Composer', 'Editor'];
+  const crewInfo = credits?.crew ? getCrewByJob(credits.crew, jobsOfInterest) : {};
+
 
   // Find official trailer 
   const trailer = videos.find(video => video.type === 'Trailer' && video.site === 'YouTube')
@@ -144,7 +187,7 @@ const DetailsPage = () => {
 
 
   return (
-    <div className="pb-10 text-white">
+    <div className="pb-10 text-white bg-neutral-900">
       {/* Backdrop Section */}
       <div className="relative w-full h-[30vh] sm:h-[50vh] lg:h-[70vh] -mt-16"> {/* Pull up behind header */}
         {backdropUrl ? (
@@ -172,14 +215,13 @@ const DetailsPage = () => {
               <Image
                 src={posterUrl}
                 alt={`Poster for ${displayTitle}`}
-                fill
+                fill={true}
                 priority
-                style={{ objectFit: 'cover' }}
-                sizes="(max-width: 768px) 150px, (max-width: 1024px) 200px, 250px"
+                sizes="(max-width: 768px) w-[150px], (max-width: 1024px) md:w-[200px], lg:w-[250px]"
                 onError={(e) => handleImageError(e, PLACEHOLDER_POSTER)}
               />
             ) : (
-              <div className="w-full h-full bg-neutral-700 flex items-center justify-center text-neutral-400 text-sm">No Poster</div>
+              <div className="w-full h-full bg-neutral-700 flex items-center justify-center text-neutral-400 text-sm">No Poster Available</div>
             )}
           </div>
 
@@ -188,8 +230,8 @@ const DetailsPage = () => {
             <h1 className="text-3xl lg:text-4xl font-bold mb-2">{displayTitle}</h1>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-neutral-400 mb-3">
               {displayDate && <span>Release Date: {new Date(displayDate).getFullYear()}</span>}
-              {displayRuntime && <><span>•</span><span>Duration: {displayRuntime[0]}h {displayRuntime[1]}m </span></>}
-              {displayRating && (
+              {displayRuntime && <><span>•</span><span>Duration: {displayRuntime} </span></>}
+              {displayRating && displayRating > 0 && (
                 <>
                   <span>•</span>
                   <span className="flex items-center gap-1">
@@ -200,13 +242,37 @@ const DetailsPage = () => {
             </div>
             <div className="flex flex-wrap gap-2 mb-4 mt-4">
               {genres?.map(genre => (
-                <span key={genre.id} className="text-xs bg-neutral-700 px-2 py-1 rounded-full">{genre.name}</span>
+                <span key={genre.id} className="text-xs bg-neutral-700 px-2 py-1 rounded-full hover:bg-neutral-600 transition-colors cursor-default">
+                  {genre.name}
+                </span>
               ))}
             </div>
             <h3 className="text-xl font-semibold mt-4 mb-2">Overview</h3>
             <p className="text-neutral-300 leading-relaxed">
               {overview || "No overview available."}
             </p>
+
+            {/** Crew Section */}
+            {Object.keys(crewInfo).length > 0 && (
+              <div className='mt-6 pt-4 border-t border-neutral-700/50'>
+                <h3 className='text-xl font-semibold mb-3'>Crew</h3>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm'>
+                  {Object.entries(crewInfo).map(([job, names]) => (
+                    <div key={job} className='flex flex-col sm:flex-row sm:items-baseline'>
+                      <span className='font-semibold text-neutral-300 w-full sm:w-32 flex-shrink-0 mb-1 sm:mb-0'>
+                        {job}:
+                      </span>
+                      <span className='text-neutral-400'>
+                        {names}
+                      </span>
+                    </div>
+                  ))}
+
+                </div>
+              </div>
+            )}
+
+
           </div>
         </div>
       </div>
@@ -214,9 +280,10 @@ const DetailsPage = () => {
       {/* Cast Section  */}
       {cast.length > 0 && (
         <div className="container mx-auto px-4 mt-10">
+
           <h3 className="text-2xl font-semibold mb-4">Cast</h3>
           <div className="flex items-start space-x-4 md:space-x-6 overflow-x-auto pb-4 scrollbar-hide">
-            {cast.slice(0, 15).map(member => ( // Show top 15 cast
+            {cast.map(member => ( // Show top 15 cast
               <CastCard key={member.cast_id || member.id} member={member} />
             ))}
           </div>
@@ -230,6 +297,18 @@ const DetailsPage = () => {
           <VideoPlayer videoKey={trailer.key} />
         </div>
       )}
+
+      {/**  Similar and Recommendations Section */}
+      <div className='container mx-auto px-4 mt-10 space-y-10'>
+        {similarData && similarData.length > 0 && (
+
+          <HorizontalScroll data={similarData} heading={"Similar " + (mediaType === 'tv' ? 'TV Shows' : 'Movies')} media_type={mediaType} />
+        )}
+        {
+          recommendationData && recommendationData.length > 0 && (
+            <HorizontalScroll data={recommendationData} heading={"Recommendations"} media_type={mediaType} />
+          )}
+      </div>
 
     </div>
   )

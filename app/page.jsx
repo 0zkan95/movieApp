@@ -38,11 +38,13 @@ export default function Home() {
   return (
     <main className="text-5xl text-center text-purple-700">
       <BannerHome />
-      <HorizontalScroll data={trendingData} heading={"Trending Theaters"} trending={true} />
+
+      <HorizontalScroll data={trendingData} heading={"Trending Theaters"} media_type={"trending"} trending={true} />
       <HorizontalScroll data={nowPlayingData} heading={"Now Playing"} media_type={"movie"} />
       <HorizontalScroll data={topRatedData} heading={"Top Rated Movies"} media_type={"movie"} />
       <HorizontalScroll data={popularTvShowData} heading={"Popular Tv Shows"} media_type={"tv"} />
       <HorizontalScroll data={onTheAirShowData} heading={"On The Air"} media_type={"tv"} />
+      
     </main>
   );
 }
