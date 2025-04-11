@@ -1,14 +1,20 @@
 "use client";
 
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux'; // useDispatch is safe to use here
+import { useDispatch } from 'react-redux'; 
 import axios from 'axios';
-import { setImageURL } from './movieSlice'; // Adjust path if needed
+import { setImageURL } from './movieSlice'; 
+import { fetchInitialData } from './movieSlice';
 
 // This component receives the rest of the app as children
 // and performs initial setup actions that require Redux dispatch
 export default function AppInitializer({ children }) {
   const dispatch = useDispatch(); // Called safely inside Provider context
+
+  useEffect(() => {
+    dispatch(fetchInitialData());
+  },[dispatch]);
+  
 
   useEffect(() => {
     const fetchConfig = async () => {

@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import moment from 'moment';
 import { FaStar } from "react-icons/fa6";
 import Image from 'next/image';
+import Link from 'next/link';
 
 const PLACEHOLDER_IMAGE = '/moviePlaceHolder.png'
 
@@ -53,7 +54,9 @@ const Cart = ({ data, trending, index, media_type }) => {
     };
 
     return (
-        <div className='block group shadow-md w-full min-w-[230px] max-w-[230px] rounded h-80 overflow-hidden relative hover:scale-105 transition-all'>
+        <Link 
+            href={detailUrl} 
+            className='block group shadow-md w-full min-w-[230px] max-w-[230px] rounded h-80 overflow-hidden relative hover:scale-105 transition-all'>
             {/* Image Container */}
             <div className="relative w-full h-full">
                 <Image // Use Next.js Image component
@@ -101,7 +104,7 @@ const Cart = ({ data, trending, index, media_type }) => {
                     )}
                 </div>
             </div>
-        </div>
+        </Link>
     )
 }
 

@@ -13,7 +13,8 @@ const BannerHome = () => {
 
     const bannerData = useSelector(state => state.movieData.bannerData)
     const imageBaseUrl = useSelector(state => state.movieData.imageURL)
-
+    const loadingStatus = useSelector(state => state.movieData.loadingStatus);
+    const error = useSelector(state => state.movieData.error);
 
 
     const [currentImage, setCurrentImage] = useState(0)
@@ -51,7 +52,7 @@ const BannerHome = () => {
     };
 
     // -- Render fallback if no data or base URL
-    if (!imageBaseUrl || bannerData.length === 0) {
+    if (loadingStatus === 'pending' || loadingStatus === 'idle') {
         return (
             <section className='relative w-full h-[450px] lg:h-[95vh] flex items-center justify-center bg-neutral-800'>
                 {/* Optional: Add a background color */}
@@ -59,6 +60,23 @@ const BannerHome = () => {
             </section>
         );
     }
+    // if error happened
+    if (loadingStatus === 'failed') {
+        return (
+            <section className='relative w-full h-[450px] lg:h-[95vh] flex items-center justify-center bg-red-800/20 text-red-300'>
+                <p>Error loading banner: {error || 'Unknown error'}</p>
+            </section>
+        );
+    }
+
+    // If succeeded
+    if (!imageBaseUrl || bannerData.length === 0) {
+        return (
+           <section className='relative w-full h-[450px] lg:h-[95vh] flex items-center justify-center bg-neutral-700 text-neutral-400'>
+               <p>No banner data available.</p>
+           </section>
+       );
+   }
 
     return (
 
@@ -128,7 +146,7 @@ const BannerHome = () => {
                                     </p>
                                     <div className='flex flex-wrap items-center gap-x-4 gap-y-1 text-xs md:text-sm mb-4 font-medium'>
 
-                                        <button className='hover:scale-105 px-5 py-2 font-semibold bg-white/20 text-purple-500 rounded-lg border border-purple/50 backdrop-blur-sm transition-all duration-300  text-sm md:text-base'>
+                                        <button className='hover:scale-105 px-5 py-2 font-semibold bg-white/20 text-purple-500 rounded-lg border border-purple/50 backdrop-blur-sm transition-all duration-300  text-sm md:text-base cursor-pointer'>
                                             Watch Now
                                         </button>
                                         {displayRating && (

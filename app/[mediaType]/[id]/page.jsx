@@ -5,12 +5,14 @@ import { useParams, notFound } from 'next/navigation';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import Image from 'next/image';
-import { FaStar } from 'react-icons/fa6';
+import { FaStar, FaPlay } from 'react-icons/fa6';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import VideoPlay from '@/components/VideoPlay';
 import VideoPlayer from '@/components/VideoPlayer';
 import CastCard from '@/components/CastCard';
 import HorizontalScroll from '@/components/HorizontalScroll';
 import useFetch from '@/hooks/useFetch';
+
 
 const VALID_MEDIA_TYPES = ['movie', 'tv'];
 const PLACEHOLDER_POSTER = '/moviePlaceHolder.png';
@@ -42,8 +44,9 @@ const DetailsPage = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
-  
+
   const { data: similarData } = useFetch(mediaType && id ? `/${mediaType}/${id}/similar` : null);
   const { data: recommendationData } = useFetch(mediaType && id ? `/${mediaType}/${id}/recommendations` : null);
 
@@ -185,6 +188,20 @@ const DetailsPage = () => {
   const trailer = videos.find(video => video.type === 'Trailer' && video.site === 'YouTube')
     || videos.find(video => video.site === 'YouTube');
 
+  const openVideoModal = () => {
+    // Optionally check if videos array is actually populated before opening
+    if (videos && videos.length > 0) {
+      setIsVideoModalOpen(true);
+    } else {
+      console.warn("No video data loaded yet or no videos available.");
+      // You could show a small notification/toast here
+    }
+  };
+
+  const closeVideoModal = () => {
+    setIsVideoModalOpen(false);
+  };
+
 
   return (
     <div className="pb-10 text-white bg-neutral-900">
@@ -212,6 +229,7 @@ const DetailsPage = () => {
           {/* Poster Image */}
           <div className="flex-shrink-0 w-[150px] h-[225px] md:w-[200px] md:h-[300px] lg:w-[250px] lg:h-[375px] relative rounded-lg overflow-hidden shadow-xl ">
             {posterUrl ? (
+
               <Image
                 src={posterUrl}
                 alt={`Poster for ${displayTitle}`}
@@ -220,8 +238,10 @@ const DetailsPage = () => {
                 sizes="(max-width: 768px) w-[150px], (max-width: 1024px) md:w-[200px], lg:w-[250px]"
                 onError={(e) => handleImageError(e, PLACEHOLDER_POSTER)}
               />
+
             ) : (
               <div className="w-full h-full bg-neutral-700 flex items-center justify-center text-neutral-400 text-sm">No Poster Available</div>
+
             )}
           </div>
 
@@ -240,6 +260,19 @@ const DetailsPage = () => {
                 </>
               )}
             </div>
+
+            {videos && videos.length > 0 && (
+              <button
+                onClick={openVideoModal}
+                className="mt-3 mb-4 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-lg shadow-md hover:bg-purple-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-neutral-900 cursor-pointer"
+              >
+                <FaPlay className="w-4 h-4" />
+                <span>Play Now</span>
+              </button>
+
+            )}
+
+
             <div className="flex flex-wrap gap-2 mb-4 mt-4">
               {genres?.map(genre => (
                 <span key={genre.id} className="text-xs bg-neutral-700 px-2 py-1 rounded-full hover:bg-neutral-600 transition-colors cursor-default">
@@ -309,6 +342,16 @@ const DetailsPage = () => {
             <HorizontalScroll data={recommendationData} heading={"Recommendations"} media_type={mediaType} />
           )}
       </div>
+
+      {/** ---- Conditionally Render VideoPlay Modal ---- */}
+      {isVideoModalOpen && (
+          <VideoPlay 
+            close={closeVideoModal} 
+            id={id} 
+            media_type={mediaType} 
+          />
+
+      )}
 
     </div>
   )
