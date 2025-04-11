@@ -19,18 +19,20 @@ const CastCard = ({ member }) => {
     };
 
     return (
-        <div className="flex-shrink-0 w-28 text-center">
-            <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden bg-neutral-700 mb-2">
-                <Image
-                    src={profileUrl}
-                    alt={member.name}
-                    fill
-                    sizes="96px"
-                    style={{ objectFit: 'cover' }}
-                    priority
-                    onError={handleImageError}
-                />
-            </div>
+        <div className=" text-center">
+            {profileUrl && (
+                <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden bg-neutral-700 mb-2 shadow-md">
+                    <Image
+                        src={profileUrl}
+                        alt={member.name}
+                        fill
+                        sizes="96px"
+                        style={{ objectFit: 'cover' }}
+                        
+                        onError={handleImageError}
+                    />
+                </div>
+            )}
             <p className="text-sm font-medium text-white truncate">{member.name}</p>
             <p className="text-xs text-neutral-400 truncate">{member.character}</p>
         </div>

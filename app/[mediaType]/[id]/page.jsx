@@ -280,7 +280,7 @@ const DetailsPage = () => {
                 </span>
               ))}
             </div>
-            <h3 className="text-xl font-semibold mt-4 mb-2">Overview</h3>
+            <h3 className="text-xl text-purple-500 font-semibold mt-4 mb-2">Overview</h3>
             <p className="text-neutral-300 leading-relaxed">
               {overview || "No overview available."}
             </p>
@@ -288,11 +288,11 @@ const DetailsPage = () => {
             {/** Crew Section */}
             {Object.keys(crewInfo).length > 0 && (
               <div className='mt-6 pt-4 border-t border-neutral-700/50'>
-                <h3 className='text-xl font-semibold mb-3'>Crew</h3>
+                <h3 className='text-xl text-purple-500 font-semibold mb-3'>Crew</h3> 
                 <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-sm'>
                   {Object.entries(crewInfo).map(([job, names]) => (
                     <div key={job} className='flex flex-col sm:flex-row sm:items-baseline'>
-                      <span className='font-semibold text-neutral-300 w-full sm:w-32 flex-shrink-0 mb-1 sm:mb-0'>
+                      <span className='font-semibold text-purple-500 w-full sm:w-32 flex-shrink-0 mb-1 sm:mb-0'>
                         {job}:
                       </span>
                       <span className='text-neutral-400'>
@@ -311,28 +311,39 @@ const DetailsPage = () => {
       </div>
 
       {/* Cast Section  */}
-      {cast.length > 0 && (
-        <div className="container mx-auto px-4 mt-10">
+      {
+        (() => {
+          const visibleCast = cast
+            .filter(member => member.profile_path)
+            .slice(0, 20);
 
-          <h3 className="text-2xl font-semibold mb-4">Cast</h3>
-          <div className="flex items-start space-x-4 md:space-x-6 overflow-x-auto pb-4 scrollbar-hide">
-            {cast.map(member => ( // Show top 15 cast
-              <CastCard key={member.cast_id || member.id} member={member} />
-            ))}
-          </div>
-        </div>
-      )}
+          return visibleCast.length > 0 && (
+            <div className="container mx-auto px-4 mt-10">
+
+              <h3 className="text-3xl text-purple-500 font-semibold mb-4 ml-6">Cast</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 ">
+                {visibleCast.map(member => ( 
+                  <CastCard key={member.cast_id || member.id} member={member} />
+                ))}
+              </div>
+            </div>
+          )
+        })
+      ()}
+
+
+
 
       {/* Videos / Trailer Section  */}
       {trailer && (
         <div className="container mx-auto px-4 mt-10">
-          <h3 className="text-2xl font-semibold mb-4">Trailer</h3>
+          <h3 className="text-3xl text-purple-500 font-semibold mb-4 ml-6">Trailer</h3>
           <VideoPlayer videoKey={trailer.key} />
         </div>
       )}
 
       {/**  Similar and Recommendations Section */}
-      <div className='container mx-auto px-4 mt-10 space-y-10'>
+      <div className='container text-purple-500 mx-auto px-4 mt-10 space-y-10'>
         {similarData && similarData.length > 0 && (
 
           <HorizontalScroll data={similarData} heading={"Similar " + (mediaType === 'tv' ? 'TV Shows' : 'Movies')} media_type={mediaType} />
@@ -345,11 +356,11 @@ const DetailsPage = () => {
 
       {/** ---- Conditionally Render VideoPlay Modal ---- */}
       {isVideoModalOpen && (
-          <VideoPlay 
-            close={closeVideoModal} 
-            id={id} 
-            media_type={mediaType} 
-          />
+        <VideoPlay
+          close={closeVideoModal}
+          id={id}
+          media_type={mediaType}
+        />
 
       )}
 
