@@ -2,7 +2,7 @@ import React, { useRef } from 'react'
 import Cart from "@/components/Cart";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Link from 'next/link';
-import LoadingSpinner from './LoadingSpinner';
+
 
 const HorizontalScroll = ({ data = [], heading, trending, media_type }) => {
 
@@ -27,30 +27,26 @@ const HorizontalScroll = ({ data = [], heading, trending, media_type }) => {
           className="flex overflow-x-scroll gap-6 scrollbar-hide py-4"
           ref={containerRef}
         >
-          {data.map((item, index) => {
+          {data?.map((item, index) => {
 
             if (!item || !item.id) return null;
 
-            if (!media_type || !item.id) {
-              console.warn(`HorizontalScroll (${heading}): Skipping item without id or mediaType`, item);
-              return null;
-            }
+            const itemMediaType = media_type === 'trending' ? item.media_type : media_type;
 
-            const detailUrl = `/${media_type}/${item.id}`;
-
+            const detailUrl = `/${itemMediaType}/${item.id}`;
 
             return (
-                <Link href={detailUrl} key={item.id + '-' + heading} className='flex-shrink-0'>
+              <Link href={detailUrl} key={item.id + '-' + heading} className='flex-shrink-0'>
 
-                      <Cart
-                        
-                        data={item}
-                        index={index + 1}
-                        trending={trending}
-                        media_type={media_type}
-                      />
-                      
-                </Link>
+                <Cart
+
+                  data={item}
+                  index={index + 1}
+                  trending={trending}
+                  media_type={itemMediaType}
+                />
+
+              </Link>
             )
           })}
         </div>

@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { FaChevronLeft, FaChevronRight, FaStar } from "react-icons/fa";
 import Image from 'next/image';
 import LoadingSpinner from './LoadingSpinner';
+import Link from 'next/link';
 
 
 
@@ -72,11 +73,11 @@ const BannerHome = () => {
     // If succeeded
     if (!imageBaseUrl || bannerData.length === 0) {
         return (
-           <section className='relative w-full h-[450px] lg:h-[95vh] flex items-center justify-center bg-neutral-700 text-neutral-400'>
-               <p>No banner data available.</p>
-           </section>
-       );
-   }
+            <section className='relative w-full h-[450px] lg:h-[95vh] flex items-center justify-center bg-neutral-700 text-neutral-400'>
+                <p>No banner data available.</p>
+            </section>
+        );
+    }
 
     return (
 
@@ -99,8 +100,16 @@ const BannerHome = () => {
                         name,
                         overview,
                         vote_average,
-                        popularity
+                        popularity,
+                        media_type
                     } = data;
+
+                    // ---> Ensure media type exists for the link!
+                    if (!media_type) {
+                        console.warn("Banner item missing media_type:", data);
+                    }
+
+                    const detailUrl = `/${media_type}/${id}?play=true`;
 
                     // Prefer backdrop, fallback to poster
                     const imagePath = backdrop_path ?? poster_path;
@@ -136,7 +145,7 @@ const BannerHome = () => {
                             <div className='absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent'></div>
 
                             {/* Content Overlay */}
-                            <div className='absolute bottom-0 left-0 flex flex-col justify-end p-4 md:p-8 lg:p-12 text-neutral-400 z-10'>
+                            <div className='absolute bottom-0 left-0 flex flex-col justify-end p-4 md:p-8 lg:p-12 text-neutral-400 z-50'>
                                 <div className='container mx-auto max-w-3xl'>
                                     <h2 className='text-purple-500 font-bold text-3xl text-left md:text-4xl lg:text-5xl mb-2 text-shadow-md'>
                                         {displayName}
@@ -146,9 +155,7 @@ const BannerHome = () => {
                                     </p>
                                     <div className='flex flex-wrap items-center gap-x-4 gap-y-1 text-xs md:text-sm mb-4 font-medium'>
 
-                                        <button className='hover:scale-105 px-5 py-2 font-semibold bg-white/20 text-purple-500 rounded-lg border border-purple/50 backdrop-blur-sm transition-all duration-300  text-sm md:text-base cursor-pointer'>
-                                            Watch Now
-                                        </button>
+
                                         {displayRating && (
                                             <span className='flex items-center'>
                                                 <FaStar className='text-yellow-400 mr-1' /> {displayRating}+ Rating
@@ -158,6 +165,16 @@ const BannerHome = () => {
                                         {displayPopularity && (
                                             <span>Popularity: {displayPopularity}</span>
                                         )}
+                                        <Link 
+                                            passHref 
+                                            legacyBehavior
+                                            href={detailUrl}
+                                        >
+                                            <a className='inline-block px-5 py-2 font-semibold bg-white/20 text-purple-500 rounded-lg border border-purple/50 backdrop-blur-sm transition-all duration-300 text-sm cursor-pointer hover:scale-105'>
+                                                Watch Now
+
+                                            </a>
+                                        </Link>
                                     </div>
 
                                 </div>
@@ -168,19 +185,19 @@ const BannerHome = () => {
             </div>
 
             {/* Navigation Buttons (Desktop Only - placed outside the sliding container) */}
-            <div className='absolute inset-y-0 left-0 right-0 items-center justify-between text-white lg:flex hidden z-20'>
+            <div className='pointer-events-none absolute inset-y-0 left-0 right-0 items-center justify-between text-white lg:flex hidden z-20'>
                 {/* Added z-index */}
                 <button
                     onClick={handlePrev}
                     aria-label="Previous slide"
-                    className='absolute -left-2 top-1/2 -translate-y-1/2 ml-4 p-3 bg-black/30 rounded-full text-purple-500 duration-300 cursor-pointer hover:scale-110'
+                    className='pointer-events-auto absolute -left-2 top-1/2 -translate-y-1/2 ml-4 p-3 bg-black/30 rounded-full text-purple-500 duration-300 cursor-pointer hover:scale-110'
                 >
                     <FaChevronLeft size={30} />
                 </button>
                 <button
                     onClick={handleNext}
                     aria-label="Next slide"
-                    className='absolute -right-2 top-1/2 -translate-y-1/2 mr-4 p-3 bg-black/30 rounded-full text-purple-500 duration-300 cursor-pointer hover:scale-110'
+                    className='pointer-events-auto absolute -right-2 top-1/2 -translate-y-1/2 mr-4 p-3 bg-black/30 rounded-full text-purple-500 duration-300 cursor-pointer hover:scale-110'
                 >
                     <FaChevronRight size={30} />
                 </button>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, notFound } from 'next/navigation';
+import { useParams, notFound, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
 import Image from 'next/image';
@@ -36,6 +36,7 @@ const DetailsPage = () => {
   const params = useParams();
   const mediaType = params.mediaType; // 'movie' or 'tv'
   const id = params.id;               // e.g., '12345'
+  const searchParams = useSearchParams();
 
   const imageBaseUrl = useSelector(state => state.movieData.imageURL);
 
@@ -201,7 +202,6 @@ const DetailsPage = () => {
   const closeVideoModal = () => {
     setIsVideoModalOpen(false);
   };
-
 
   return (
     <div className="pb-10 text-white bg-neutral-900">

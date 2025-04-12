@@ -54,8 +54,7 @@ const Cart = ({ data, trending, index, media_type }) => {
     };
 
     return (
-        <Link 
-            href={detailUrl} 
+        <div 
             className='block group shadow-md w-full min-w-[230px] max-w-[230px] rounded h-80 overflow-hidden relative hover:scale-105 transition-all'>
             {/* Image Container */}
             <div className="relative w-full h-full">
@@ -104,7 +103,7 @@ const Cart = ({ data, trending, index, media_type }) => {
                     )}
                 </div>
             </div>
-        </Link>
+        </div>
     )
 }
 

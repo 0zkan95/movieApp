@@ -2,7 +2,7 @@
 import BannerHome from "@/components/BannerHome";
 import HorizontalScroll from "@/components/HorizontalScroll";
 import useFetch from "@/hooks/useFetch";
-import { setBannerData, setImageURL } from "@/store/movieSlice";
+import { setBannerData } from "@/store/movieSlice";
 import axios from "axios";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 export default function Home() {
   const dispatch = useDispatch();
+  
   const { data: nowPlayingData } = useFetch('/movie/now_playing');
   const { data: topRatedData } = useFetch('/movie/top_rated');
   const { data: popularTvShowData } = useFetch('/tv/popular');
@@ -21,7 +22,7 @@ export default function Home() {
     try {
       const response = await axios.get('/trending/all/week')
       dispatch(setBannerData(response.data.results));
-
+      
     } catch (error) {
       console.error("API Error: ", error)
     }
@@ -32,7 +33,8 @@ export default function Home() {
   },[dispatch])
 
 
-  const trendingData = useSelector(state => state.movieData.bannerData)
+  const trendingData = useSelector(state => state.movieData.bannerData);
+  
 
 
   return (
